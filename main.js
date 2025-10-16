@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage, powerSaveBlocker, powerMonitor } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, powerSaveBlocker, powerMonitor, dialog} = require('electron');
 const path = require('path');
 const log = require('electron-log');
 const Config = require('electron-config');
@@ -9,10 +9,15 @@ let splashWindow = null;
 let tray = null;
 let psbId = null; // id retornado por powerSaveBlocker
 const START_URL = 'https://lebot.lecard.delivery/'
+const { version } = require('./package.json');
 
 if (process.platform === 'win32') {
   app.setAppUserModelId('app.lecard.lebot');
 }
+
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+Menu.setApplicationMenu(createMenu());
 
 function createSplash() {
   splashWindow = new BrowserWindow({
@@ -28,8 +33,6 @@ function createSplash() {
 
   splashWindow.loadFile(path.join(__dirname, 'splash.html'));
   splashWindow.center();
-
-  log.info('Splash screen criada.');
 }
 
 function createWindow() {
@@ -82,7 +85,6 @@ function createWindow() {
     const elapsed = Date.now() - splashStart;
     const remaining = Math.max(0, splashMinTime - elapsed);
 
-    log.info('Página carregada com sucesso.');
     setTimeout(() => {
       if (splashWindow && !splashWindow.isDestroyed()) {
         splashWindow.close();
@@ -101,7 +103,6 @@ function createWindow() {
 
 function startPreventSleep() {
   if (psbId !== null && powerSaveBlocker.isStarted(psbId)) return psbId; // já ativo
-  // 'prevent-display-sleep' costuma ser o mais usado para manter tela ligada
   psbId = powerSaveBlocker.start('prevent-display-sleep');
   log.info('powerSaveBlocker started, id =', psbId);
   return psbId;
@@ -146,13 +147,13 @@ function createTray() {
       }
     },
     { type: 'separator' },
-    { label: 'Abrir app', click: () => { mainWindow.show(); log.info('App reaberto da bandeja'); } },
     { label: 'Abrir logs', click: () => { require('electron').shell.openPath(log.transports.file.getFile().path); } },
     { label: 'Sair', click: () => { app.isQuiting = true; app.quit(); } }
   ]);
 
   tray.setToolTip('LeBot Desktop');
   tray.setContextMenu(contextMenu);
+  tray.on('click', toggleWindow)
 
   // aplica estado inicial
   if (keepScreenOn) {
@@ -160,7 +161,103 @@ function createTray() {
   }
 
   updateTrayTooltip(keepScreenOn);
-  log.info('Tray criado. keepScreenOn=' + keepScreenOn);
+}
+
+function toggleWindow() {
+  if (!mainWindow) return;
+
+  if (mainWindow.isVisible()) {
+    mainWindow.hide();
+
+  } else {
+    mainWindow.show();
+    mainWindow.focus();
+  }
+}
+
+function createMenu() {
+  const menus = [
+    {
+      label: 'Ajuda',
+      submenu: [
+        {
+          label: 'Logs do Sistema',
+          click: () => {
+            require('electron').shell.openPath(log.transports.file.getFile().path);
+          }
+        },
+        {
+          label: 'Licença',
+          click: () => {
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              buttons: ['OK'],
+              title: 'Lincença',
+              message: 'LeBot Desktop\nStatus: Ativo\nVersão: ' + version
+            });
+          }
+        },
+      ]
+    },
+    {
+      label: 'Editar',
+      submenu: [
+        {
+          label: 'Desfazer',
+          accelerator: 'CmdOrCtrl+Z',
+          role: 'undo',
+        },
+        {
+          label: 'Refazer',
+          accelerator: 'Shift+CmdOrCtrl+Z',
+          role: 'redo',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Cortar',
+          accelerator: 'CmdOrCtrl+X',
+          role: 'cut',
+        },
+        {
+          label: 'Copiar',
+          accelerator: 'CmdOrCtrl+C',
+          role: 'copy',
+        },
+        {
+          label: 'Colar',
+          accelerator: 'CmdOrCtrl+V',
+          role: 'paste',
+        },
+        {
+          label: 'Selecionar',
+          accelerator: 'CmdOrCtrl+A',
+          role: 'selectAll',
+        }
+      ]
+    }
+  ];
+
+  return Menu.buildFromTemplate(menus);
+}
+
+function updateTrayTooltip(active) {
+  tray.setToolTip(active ? 'LeBot Desktop (Tela ligada)' : 'LeBot Desktop');
+}
+
+function setDockIcon() {
+  if (process.platform === 'darwin') {
+    const iconPath = path.join(__dirname, 'assets', 'logo.png');
+    const dockIcon = nativeImage.createFromPath(iconPath);
+    if (!dockIcon.isEmpty()) {
+      console.log('elias')
+      app.dock.setIcon(dockIcon);
+
+    } else {
+      log.warn('Falha ao carregar ícone do Dock:', iconPath);
+    }
+  }
 }
 
 app.whenReady().then(() => {
@@ -199,21 +296,3 @@ app.on('before-quit', () => {
   // garantir que paramos o powerSaveBlocker
   stopPreventSleep();
 });
-
-function updateTrayTooltip(active) {
-  tray.setToolTip(active ? 'LeBot Desktop (mantendo tela ligada)' : 'LeBot Desktop');
-}
-
-function setDockIcon() {
-  if (process.platform === 'darwin') {
-    const iconPath = path.join(__dirname, 'assets', 'logo.png');
-    const dockIcon = nativeImage.createFromPath(iconPath);
-    if (!dockIcon.isEmpty()) {
-      console.log('elias')
-      app.dock.setIcon(dockIcon);
-
-    } else {
-      log.warn('Falha ao carregar ícone do Dock:', iconPath);
-    }
-  }
-}

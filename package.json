@@ -6,8 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "build": "electron-builder --win --x64"
   },
   "author": "",
   "license": "MIT",
@@ -22,13 +21,17 @@
       "category": "public.app-category.productivity"
     },
     "win": {
-      "icon": "icon.ico"
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
     },
     "nsis": {
-      "oneClick": false,
+      "oneClick": true,
       "perMachine": false,
       "allowElevation": true,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": false,
+      "artifactName": "LeBot-${version}.exe"
     }
   },
   "dependencies": {
