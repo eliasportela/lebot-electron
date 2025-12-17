@@ -1,55 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>LeBot Desktop</title>
+
     <style>
+        :root {
+            --bg-color: #0E6E61;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --accent: #1CC88A;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         html, body {
-            margin: 0;
-            padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #101824;
+            margin: 0;
+            background-color: var(--bg-color);
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            color: #fff;
-            font-family: "Segoe UI", sans-serif;
+            color: var(--text-primary);
             overflow: hidden;
         }
 
-        img {
-            width: 110px;
-            height: auto;
-            margin-bottom: 25px;
+        .splash {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .logo {
+            width: 88px;
             user-select: none;
         }
 
+        .app-name {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .loader {
+            width: 160px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            overflow: hidden;
+            border-radius: 1px;
+        }
+
+        .loader::after {
+            content: "";
+            display: block;
+            width: 40%;
+            height: 100%;
+            background: var(--accent);
+            animation: loading 1.2s ease-in-out infinite;
+        }
+
         .loading-text {
-            font-size: 14px;
-            opacity: 0.85;
-            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 0.2px;
         }
 
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.15);
-            border-top: 3px solid #00b4ff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(250%);
+            }
         }
     </style>
 </head>
+
 <body>
-<img src="./assets/logo.png" alt="LeBot Logo">
-<div class="spinner"></div>
-<div class="loading-text">Carregando LeBot...</div>
+<div class="splash">
+    <img src="./assets/logo.png" alt="LeBot Logo" class="logo" />
+    <div class="app-name">LeBot</div>
+    <div class="loader"></div>
+    <div class="loading-text">Inicializando aplicação…</div>
+</div>
 </body>
 </html>

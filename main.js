@@ -28,11 +28,15 @@ function createSplash() {
     alwaysOnTop: true,
     resizable: false,
     icon: path.join(__dirname, 'icon.ico'),
-    show: true
+    show: false
   });
 
   splashWindow.loadFile(path.join(__dirname, 'splash.html'));
   splashWindow.center();
+
+  splashWindow.once('ready-to-show', () => {
+    splashWindow.show();
+  });
 }
 
 function createWindow() {
@@ -187,6 +191,12 @@ function createMenu() {
           }
         },
         {
+          label: 'Dev Tools',
+          click: () => {
+            mainWindow.webContents.openDevTools();
+          }
+        },
+        {
           label: 'Licença',
           click: () => {
             dialog.showMessageBox(mainWindow, {
@@ -251,7 +261,6 @@ function setDockIcon() {
     const iconPath = path.join(__dirname, 'assets', 'logo.png');
     const dockIcon = nativeImage.createFromPath(iconPath);
     if (!dockIcon.isEmpty()) {
-      console.log('elias')
       app.dock.setIcon(dockIcon);
 
     } else {

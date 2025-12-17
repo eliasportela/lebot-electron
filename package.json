@@ -1,7 +1,7 @@
 {
   "name": "lebot-electron",
   "productName": "LeBot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LeBot - Sistema de chamados",
   "main": "main.js",
   "scripts": {
