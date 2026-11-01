@@ -12,7 +12,7 @@ const START_URL = 'https://lebot.lecard.delivery/'
 const { version } = require('./package.json');
 
 if (process.platform === 'win32') {
-  app.setAppUserModelId('app.lecard.lebot');
+  app.setAppUserModelId('app.lecard.lebotdesk');
 }
 
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
@@ -155,7 +155,7 @@ function createTray() {
     { label: 'Sair', click: () => { app.isQuiting = true; app.quit(); } }
   ]);
 
-  tray.setToolTip('LeBot Desktop');
+  tray.setToolTip('Lebot Desk');
   tray.setContextMenu(contextMenu);
   tray.on('click', toggleWindow)
 
@@ -203,7 +203,7 @@ function createMenu() {
               type: 'info',
               buttons: ['OK'],
               title: 'Lincença',
-              message: 'LeBot Desktop\nStatus: Ativo\nVersão: ' + version
+              message: 'Lebot Desk\nStatus: Ativo\nVersão: ' + version
             });
           }
         },
@@ -253,7 +253,7 @@ function createMenu() {
 }
 
 function updateTrayTooltip(active) {
-  tray.setToolTip(active ? 'LeBot Desktop (Tela ligada)' : 'LeBot Desktop');
+  tray.setToolTip(active ? 'Lebot Desk (Tela ligada)' : 'Lebot Desk');
 }
 
 function setDockIcon() {

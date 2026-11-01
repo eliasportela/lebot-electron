@@ -1,8 +1,8 @@
 {
-  "name": "lebot-electron",
-  "productName": "LeBot",
-  "version": "1.0.1",
-  "description": "LeBot - Sistema de chamados",
+  "name": "lebot-desk",
+  "productName": "LebotDesk",
+  "version": "1.0.2",
+  "description": "Lebot Desk - Sistema de chamados",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -15,7 +15,7 @@
     "electron-builder": "^24.0.0"
   },
   "build": {
-    "appId": "app.lecard.lebot",
+    "appId": "app.lecard.lebotdesk",
     "mac": {
       "icon": "build/icon.icns",
       "category": "public.app-category.productivity"
@@ -31,7 +31,7 @@
       "perMachine": false,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": false,
-      "artifactName": "LeBot-${version}.exe"
+      "artifactName": "LebotDesk-${version}.exe"
     }
   },
   "dependencies": {
