@@ -2,9 +2,11 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, powerSaveBlocker, powerMoni
 const path = require('path');
 const log = require('electron-log');
 const Config = require('electron-config');
+const { createUpdates } = require('./updates');
 
 const config = new Config();
 let mainWindow = null;
+const updates = createUpdates(() => mainWindow);
 let splashWindow = null;
 let tray = null;
 let psbId = null; // id retornado por powerSaveBlocker
@@ -151,6 +153,7 @@ function createTray() {
       }
     },
     { type: 'separator' },
+    { label: 'Verificar atualização', click: () => updates.check(true) },
     { label: 'Abrir logs', click: () => { require('electron').shell.openPath(log.transports.file.getFile().path); } },
     { label: 'Sair', click: () => { app.isQuiting = true; app.quit(); } }
   ]);
@@ -184,6 +187,10 @@ function createMenu() {
     {
       label: 'Ajuda',
       submenu: [
+        {
+          label: 'Verificar atualização',
+          click: () => updates.check(true)
+        },
         {
           label: 'Logs do Sistema',
           click: () => {
@@ -280,6 +287,7 @@ app.whenReady().then(() => {
   createSplash();
   createWindow();
   createTray();
+  updates.check();
 
   // Se demorar demais, fecha splash de segurança
   setTimeout(() => {
@@ -302,6 +310,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', () => {
+  app.isQuiting = true;
   // garantir que paramos o powerSaveBlocker
   stopPreventSleep();
 });
